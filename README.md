@@ -4,96 +4,111 @@
 
 **Research deeply. Write clearly. Publish responsibly.**
 
-An AI-powered multi-agent content studio for creators — built with **LangGraph**, **FastAPI**, **React + TypeScript**, **Tailwind CSS v4**, and **automatic multi-provider AI failover**.
+An open-source, multi-agent AI editorial studio that turns any topic into source-grounded, fact-checked, social-ready posts for **LinkedIn**, **X (Twitter)**, and **Instagram** — with live step-by-step streaming and 1-click publishing.
 
-[![Backend Checks](https://img.shields.io/badge/Backend-FastAPI%20%7C%20LangGraph%20%7C%20Python%203.11%2B-4f46e5?style=flat-square)](#tech-stack)
-[![Frontend Checks](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Vite-ec4899?style=flat-square)](#tech-stack)
-[![Verification](https://img.shields.io/badge/Tests-pytest%20%2B%20vitest%20%2B%20mypy%20%2B%20ruff-14b8a6?style=flat-square)](#testing--verification)
+[![FastAPI + LangGraph](https://img.shields.io/badge/Backend-FastAPI%20%7C%20LangGraph%20%7C%20Python%203.11%2B-4f46e5?style=flat-square)](#tech-stack)
+[![React + TypeScript](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Tailwind%20v4-ec4899?style=flat-square)](#tech-stack)
+[![Verification](https://img.shields.io/badge/Verified-pytest%20%7C%20vitest%20%7C%20mypy%20%7C%20ruff-14b8a6?style=flat-square)](#testing--verification)
 
 </div>
 
 ---
 
-## What is Veridra?
+## Why Veridra?
 
-Most AI writing tools generate a generic post from a single prompt with no source verification, no quality review, and raw Markdown that breaks when pasted into LinkedIn, X, or Instagram.
+Most AI writing tools generate a post from a single opaque prompt — often inventing statistics, dumping unformatted Markdown (`**bold**`, `## headings`) that breaks on social platforms, and offering zero visibility into where claims came from.
 
-**Veridra** solves this with a transparent 4-agent editorial pipeline:
-1. **Researcher** — Searches the live web (Tavily) and fetches public pages safely to gather real, timestamped sources and evidence snippets.
-2. **Writer** — Drafts a platform-tailored post with **bold** takeaways, *italics*, clean bullet points, and inline embedded `[Source](url)` links.
-3. **Editor** — Scores the draft on a 7-part rubric (`clarity`, `depth`, `audience`, `structure`, `platform_fit`, `specificity`, `tone`) and requests bounded revisions if needed.
-4. **Fact Checker** — Audits every material factual claim against the collected evidence, strips hallucinated citations, and flags anything uncertain before you publish.
-
----
-
-## Webapp Tour & Screenshots
-
-> **Note on screenshots:** Place captured screenshots in [`docs/screenshots/`](docs/screenshots/) using the filenames below (or enable Chrome remote debugging at `chrome://inspect/#remote-debugging` with the app running at `http://localhost:5173` to auto-capture them).
-
-### 1. Home & Creator Dashboard (`/`)
-Your command center for recent drafts, quality averages, evidence coverage, and quick shortcuts into creating a new post or revisiting past campaigns.
-![Dashboard](docs/screenshots/dashboard.png)
-
-### 2. Create a Post (`/create`)
-A clean, creator-friendly workflow builder:
-- **Topic & Goal** — Describe what you want to post about (plus optional sample prompts to test immediately).
-- **Target Platform** — Tailored formatting for **LinkedIn**, **X (Twitter) Threads**, or **Instagram Captions**.
-- **AI Assistant Picker** — Choose between **GPT-4o mini (OpenRouter)**, **GPT-OSS 120B (Groq)**, **Qwen 3.8 27B (Groq)**, **Gemini 3.6 Flash**, **Gemini 3.5 Flash**, or **ChatGPT (OpenAI)** — with automatic cross-provider failover if any free-tier API hits a rate limit.
-- **Practice (Demo) Mode** — Test the full workflow without spending API credits.
-![Create Post](docs/screenshots/create-post.png)
-
-### 3. Live Step-by-Step Progress (`/runs/:runId`)
-Watch every stage stream live over **Server-Sent Events (SSE)**:
-- `1. Exploring Sources` → `2. Writing Your Draft` → `3. Polishing Tone & Hook` → `4. Fact-Checking Claims` → `5. Finalizing Post`
-- Shows sources found, polish passes, fact-check passes, and allows instant cancellation at any step.
-![Live Progress](docs/screenshots/live-progress.png)
-
-### 4. Post Studio — Rich Formatting & 1-Click Publish (`/runs/:runId/studio`)
-Turn verified drafts into ready-to-publish social posts:
-- **Side-by-side Editor & Channel Preview** — Toggle between **Styled** preview (rendered headings, bold, italics, bullet lists, and clickable embedded links) and **Social text** (exact Unicode-formatted bold/italics + `•` bullets for LinkedIn, X, and Instagram).
-- **1-Click Post** — Click **1-Click Post to LinkedIn / X / Instagram** (or cross-post buttons) to copy the formatted post and open a pre-filled composer — or publish directly via API when connected in `backend/.env`.
-- **Safe Versioning & Export** — Save manual edits as new versions without losing the AI original, or export `.md` / `.txt`.
-![Post Studio](docs/screenshots/content-studio.png)
-
-### 5. Sources & Fact Checks (Inside Post Studio)
-Every factual claim in your post is mapped to retrieved evidence (`supported`, `partially_supported`, `uncertain`, `unsupported`, `contradicted`) with clickable links back to the exact source snippet. Unresolved claims trigger a gentle safety check before copying.
-![Fact Checks](docs/screenshots/fact-checks.png)
-
-### 6. Benchmarks (`/benchmarks`)
-Compare **Single-Agent** baseline output vs. **Multi-Agent** Veridra pipelines side by side across editorial score, fact coverage, latency, and token usage using the built-in evaluation dataset (`veridra-eval-v1`).
-![Benchmarks](docs/screenshots/benchmarks.png)
-
-### 7. Settings — Light/Dark Glass Theme, AI Keys & Connected Accounts (`/settings`)
-- **Look & Theme** — Switch between **Light editorial**, **Midnight dark**, and **System match** (Apple-inspired Aurora Liquid Glass UI).
-- **Connected AI & Web Search** — Live status indicators for OpenAI, Groq, OpenRouter, Gemini, and Tavily (keys are never exposed to the browser).
-- **1-Click Publishing & Connected Social Accounts** — Shows composer-ready status for LinkedIn, X, and Instagram plus optional direct API posting status (`LINKEDIN_ACCESS_TOKEN`, `X_ACCESS_TOKEN`).
-![Settings](docs/screenshots/settings.png)
+**Veridra** replaces single-prompt guesswork with a deterministic **LangGraph** editorial workflow:
+1. **Researches the live web first** using Tavily Search and an SSRF-safe public page fetcher.
+2. **Writes platform-native drafts** with **bold** takeaways, *italics*, scannable bullet points, and inline embedded `[Source](url)` links.
+3. **Critiques & polishes** against a 7-dimension editorial rubric before passing to verification.
+4. **Fact-checks every material claim** against collected evidence, stripping hallucinated citations and flagging uncertain points before you copy or publish.
+5. **Formats & publishes in 1 click** to LinkedIn, X, and Instagram.
 
 ---
 
-## Architecture & Agentic Pipeline
+## How the Multi-Agent Pipeline Works
 
 ```mermaid
 flowchart LR
-    UI["React + Vite Studio"] <-->|"REST + SSE Events"| API["FastAPI Backend"]
+    UI["React + Vite Studio"] <-->|"REST + SSE (/events)"| API["FastAPI Backend"]
     API --> Graph["LangGraph StateGraph"]
-    Graph --> R["Researcher (Tavily + Safe Fetch)"]
+    Graph --> R["1. Researcher<br/>(Tavily + Safe Fetch)"]
     R --> Gate{"Evidence Gate"}
-    Gate -->|"Sufficient"| W["Writer (Formatted Markdown + Links)"]
-    Gate -->|"Retry <= 1"| R
-    W --> E["Editor (7-Part Rubric)"]
-    E -->|"Revise <= 3"| W
-    E -->|"Approve"| FC["Fact Checker (Claim Audit)"]
-    FC -->|"Remediate <= 2"| W
-    FC -->|"Pass / Warn"| Fin["Finalizer + Clean Sources"]
-    Fin --> Pub["1-Click Social Publish / Export"]
+    Gate -->|"Sufficient"| W["2. Writer<br/>(Formatted Draft + Inline Links)"]
+    Gate -->|"Retry (<= 1)"| R
+    W --> E["3. Editor<br/>(7-Part Rubric)"]
+    E -->|"Revise (<= 3)"| W
+    E -->|"Approve"| FC["4. Fact Checker<br/>(Claim Audit)"]
+    FC -->|"Remediate (<= 2)"| W
+    FC -->|"Pass / Warn"| Fin["5. Finalizer<br/>(Artifact + Clean Sources)"]
+    Fin --> Pub["Post Studio & 1-Click Publish"]
 ```
 
-### Reliability & Trust Guardrails
-- **Automatic Cross-Provider Failover** (`ResilientLLMProvider`): When a provider returns `429` (rate limit), `503` (heavy traffic), or times out, Veridra automatically fails over to your next configured AI provider while recording the exact `provider` and `model` that fulfilled each step.
-- **Deterministic Loop Ceilings**: Python routing code (`backend/app/graph/routing.py`) enforces `MAX_EDITOR_REVISIONS=3`, `MAX_FACT_REMEDIATIONS=2`, `MAX_RESEARCH_RETRIES=1`, `MAX_GRAPH_STEPS=24`, and `RUN_TIMEOUT_SECONDS=600`.
-- **SSRF & Prompt-Injection Defenses**: Public page fetching (`backend/app/core/security.py`) allows `http`/`https` only and blocks loopback, private, link-local, and cloud metadata IPs before connecting and on every redirect. Retrieved web content is isolated inside `<untrusted_source_data>` tags.
-- **Honest Telemetry & Secret Redaction**: Token counts and costs are never fabricated if a provider omits them, and all API keys/tokens are scrubbed from structured logs (`secret_values()`).
+### The Four Specialized Agents
+| Agent | Responsibility | Key Output |
+|---|---|---|
+| **Researcher** | Plans focused search queries, retrieves Tavily results, fetches public pages safely, and builds an evidence package. | Structured `ResearchBrief` with source IDs, URLs, publishers, and excerpts. |
+| **Writer** | Drafts a post tailored to platform, audience, tone, and depth with bold lead-ins, italics, bullet points, and inline links. | `WriterDraftOutput` with `factual_claims` linked to `evidence_ids`. |
+| **Editor** | Evaluates `clarity`, `depth`, `audience`, `structure`, `platform_fit`, `specificity`, and `tone` (0–100). | `EditorResult` (`approve`, `revise`, or `blocked`) with actionable feedback. |
+| **Fact Checker** | Audits every factual claim against retrieved evidence, strips invalid `evidence_ids`, and flags unsupported claims. | `FactCheckResult` (`pass`, `needs_revision`, `blocked`) + claim-level statuses. |
+
+---
+
+## Webapp Features & Sections
+
+### Home Dashboard (`/`)
+- **At-a-glance creator metrics**: Total runs, completion rate, average editorial score, evidence coverage, median latency, and token/cost summaries.
+- **Recent drafts feed**: Jump directly into any live run or finished draft in Post Studio.
+
+### Create Post (`/create`)
+- **Brief Builder**: Enter your topic, target platform (**LinkedIn**, **X Thread**, or **Instagram Caption**), depth (`concise`, `standard`, `deep`), audience, goal, tone, and optional user-supplied reference URLs.
+- **AI Assistant Selector**: Choose from configured providers (**OpenRouter**, **Groq**, **Google Gemini**, **ChatGPT/OpenAI**) directly in the UI.
+- **Demo Mode**: Try the complete pipeline end-to-end with deterministic sample data without using any API credits.
+
+### Live Step-by-Step Progress (`/runs/:runId`)
+- Streams real-time progress over **Server-Sent Events (SSE)** (`Researching` → `Writing` → `Polishing` → `Fact-Checking` → `Finalizing`).
+- Displays retrieved source count, editorial revision count, fact-check pass count, detailed event log, and cooperative **Cancel** support.
+
+### Post Studio (`/runs/:runId/studio`)
+- **Side-by-Side Editor & Channel Preview**:
+  - **Styled View**: Renders headings, **bold**, *italics*, bullet/numbered lists, and clickable embedded links.
+  - **Social Text View**: Shows the exact Unicode-formatted text (`𝗯𝗼𝗹𝗱`, `𝑖𝑡𝑎𝑙𝑖𝑐`, `•` bullets) ready for LinkedIn, X, and Instagram.
+- **1-Click Social Publishing**:
+  - **Works out of the box**: Copies formatted post-ready text to the clipboard and opens **LinkedIn** or **X** with your post pre-filled in their composer (or copies the formatted caption and launches **Instagram**).
+  - **Optional Direct API Posting**: Add `LINKEDIN_ACCESS_TOKEN` + `LINKEDIN_PERSON_URN` or `X_ACCESS_TOKEN` in `backend/.env` to publish directly in the background via `/api/v1/artifacts/{id}/publish`.
+- **Safe Versioning & Export**: Save manual edits as new artifact versions while preserving the AI original, or export as `.md` or `.txt`.
+- **Sources & Fact Checks Tabs**: Inspect every retrieved source and audit each claim (`supported`, `partially_supported`, `uncertain`, `unsupported`, `contradicted`) with one-click navigation from a claim to its backing source.
+
+### Projects (`/projects`)
+- Group related posts under shared campaign defaults (default platform, audience, tone, and source preferences).
+
+### Benchmarks (`/benchmarks`)
+- Run paired **Single-Agent Baseline vs. Multi-Agent Veridra** comparisons across the built-in 30-topic evaluation dataset (`veridra-eval-v1`), measuring editorial score, evidence coverage, unsupported claims, latency, and token usage.
+
+### Settings (`/settings`)
+- **Theme Switcher**: Apple-inspired Aurora Liquid Glass UI in **Light editorial**, **Midnight dark**, or **System match**.
+- **Default AI Assistant**: Set your preferred default model across runs.
+- **Integrations & Connected Social Accounts**: Live configuration status for AI providers, Tavily Search, and LinkedIn / X / Instagram publishing readiness.
+
+---
+
+## Multi-Provider AI & Automatic Failover
+
+Veridra supports multiple LLM providers out of the box and wraps live execution in **`ResilientLLMProvider`**:
+- **Supported Providers**: OpenRouter (`openai/gpt-4o-mini`), Groq (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`), Google Gemini (`gemini-3.6-flash`, `gemini-3.5-flash`, `gemini-3.5-flash-lite`), and OpenAI (`gpt-4o-mini`, `gpt-4o`).
+- **Automatic Failover**: If a provider returns `429` (rate limit), `503` (heavy traffic), or times out mid-run, Veridra automatically fails over to your next configured provider so multi-step runs finish reliably.
+- **Truthful Provenance**: Every step records the exact `provider` and `model` that fulfilled it in `node_metrics`.
+
+---
+
+## Security, Trust & Guardrails
+
+- **Deterministic Loop Ceilings**: Python routing code (`backend/app/graph/routing.py`) strictly enforces `MAX_EDITOR_REVISIONS=3`, `MAX_FACT_REMEDIATIONS=2`, `MAX_RESEARCH_RETRIES=1`, `MAX_GRAPH_STEPS=24`, and `RUN_TIMEOUT_SECONDS=600`.
+- **SSRF Protection**: `backend/app/core/security.py` restricts fetching to `http`/`https`, resolves DNS before connecting, and blocks loopback, private, link-local, and cloud metadata IP ranges across redirects.
+- **Prompt-Injection Isolation**: Retrieved web snippets and user-supplied page contents are wrapped inside `<untrusted_source_data>` tags and never elevated to system instructions.
+- **No Fabricated Metrics or Costs**: If a provider omits token counts, or a model has no entry in `backend/app/core/pricing.py`, or a run uses Demo Mode, telemetry reports `Not reported` / `Unavailable` honestly.
+- **Secret Redaction**: API keys and social tokens are masked in all application logs (`secret_values()`).
 
 ---
 
@@ -115,7 +130,7 @@ flowchart LR
 - **Python 3.11+** (tested on Python 3.13)
 - **Node.js 20+** and **npm**
 
-### 1. Start the Backend
+### 1. Backend Setup
 ```bash
 cd backend
 python3 -m venv .venv
@@ -126,40 +141,21 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 - Health check: `http://127.0.0.1:8000/health`
-- Interactive API docs (development only): `http://127.0.0.1:8000/docs`
+- API docs (development only): `http://127.0.0.1:8000/docs`
 
-### 2. Start the Frontend
+### 2. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open **`http://localhost:5173`** in your browser.
+Open **`http://localhost:5173`** in your browser. Vite automatically proxies `/api` and `/health` requests to `http://127.0.0.1:8000`.
 
 ---
 
-## Environment Configuration
+## Docker & Production Deployment
 
-Copy `.env.example` to `backend/.env` and add your keys (**never commit `backend/.env` — it is excluded in `.gitignore`**):
-
-| Variable | Purpose | Default |
-|---|---|---|
-| `OPENAI_API_KEY` | ChatGPT (`gpt-4o-mini`, `gpt-4o`) | empty |
-| `GROQ_API_KEY` | Groq (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`) | empty |
-| `OPENROUTER_API_KEY` | OpenRouter multi-model hub (`openai/gpt-4o-mini`) | empty |
-| `GEMINI_API_KEY` | Google Gemini (`gemini-3.6-flash`, `gemini-3.5-flash`) | empty |
-| `TAVILY_API_KEY` | Live web research & source retrieval | empty |
-| `DEMO_MODE` | Run with deterministic local sample data (`true`/`false`) | `false` |
-| `LINKEDIN_ACCESS_TOKEN` | *(Optional)* Direct API posting to LinkedIn | empty |
-| `LINKEDIN_PERSON_URN` | *(Optional)* LinkedIn author URN (`urn:li:person:...`) | empty |
-| `X_ACCESS_TOKEN` | *(Optional)* Direct API posting to X (`POST /2/tweets`) | empty |
-| `DATABASE_URL` | SQLite locally or `postgresql+psycopg://...` | `sqlite:///./veridra.db` |
-| `EDITOR_APPROVAL_THRESHOLD` | Minimum rubric score (0–100) for approval | `75` |
-
----
-
-## Docker Setup
-
+### Docker Compose
 ```bash
 cp .env.example .env
 # Add your API keys or set DEMO_MODE=true in .env
@@ -168,6 +164,55 @@ docker compose up --build
 - **Frontend UI**: `http://localhost:8080`
 - **Backend API**: `http://localhost:8000`
 - **With PostgreSQL**: `docker compose --profile postgres up --build`
+
+### Production PostgreSQL Checklist
+1. Set `DATABASE_URL=postgresql+psycopg://user:password@host:5432/veridra`.
+2. Run `alembic upgrade head` against PostgreSQL before starting workers.
+3. Set `APP_ENV=production` (disables `/docs` and `/openapi.json`) and configure `CORS_ORIGINS`.
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `backend/.env` (or `.env` for Docker):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `APP_ENV` | `development`, `test`, or `production` | `development` |
+| `LLM_PROVIDER` | Default LLM provider (`openai`, `groq`, `openrouter`, `gemini`) | `gemini` |
+| `OPENAI_API_KEY` | OpenAI API key (`gpt-4o-mini`, `gpt-4o`) | empty |
+| `GROQ_API_KEY` | Groq API key (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`) | empty |
+| `OPENROUTER_API_KEY` | OpenRouter API key (`openai/gpt-4o-mini`) | empty |
+| `GEMINI_API_KEY` | Google Gemini API key | empty |
+| `GEMINI_MODEL` | Target Gemini model ID | `gemini-3.6-flash` |
+| `TAVILY_API_KEY` | Tavily web research API key | empty |
+| `DEMO_MODE` | Run deterministically without live API keys | `false` |
+| `LINKEDIN_ACCESS_TOKEN` | *(Optional)* Direct LinkedIn publishing token | empty |
+| `LINKEDIN_PERSON_URN` | *(Optional)* LinkedIn author URN (`urn:li:person:...`) | empty |
+| `X_ACCESS_TOKEN` | *(Optional)* Direct X API v2 user token | empty |
+| `DATABASE_URL` | SQLite locally or PostgreSQL URI in production | `sqlite:///./veridra.db` |
+| `EDITOR_APPROVAL_THRESHOLD` | Minimum editorial score (0–100) for approval | `75` |
+| `MAX_EDITOR_REVISIONS` | Maximum writer ↔ editor revision passes | `3` |
+| `MAX_FACT_REMEDIATIONS` | Maximum fact-checker → writer remediation passes | `2` |
+
+---
+
+## API Overview
+
+| Method & Endpoint | Description |
+|---|---|
+| `GET /health` | Service health check |
+| `GET /api/v1/settings/integrations` | Configured AI models, search status, and social connection status |
+| `GET /api/v1/dashboard/summary` | Aggregate metrics across runs |
+| `POST /api/v1/projects` / `GET /api/v1/projects` | Create and list content projects |
+| `POST /api/v1/runs` | Start a new multi-agent or single-agent post generation run |
+| `GET /api/v1/runs/{id}` | Full run detail (drafts, sources, claims, metrics, events) |
+| `GET /api/v1/runs/{id}/events` | Server-Sent Events (SSE) stream for live progress |
+| `POST /api/v1/runs/{id}/cancel` / `POST /api/v1/runs/{id}/retry` | Cancel or re-run a workflow |
+| `PUT /api/v1/artifacts/{id}` | Save a user-edited draft as a new version |
+| `GET /api/v1/artifacts/{id}/export?format=md\|txt` | Export draft as Markdown or plain text |
+| `POST /api/v1/artifacts/{id}/publish` | Publish via connected social API or return pre-filled composer URL |
+| `POST /api/v1/benchmarks` / `GET /api/v1/benchmarks/{id}` | Run and inspect single-agent vs. multi-agent benchmarks |
 
 ---
 
@@ -178,43 +223,33 @@ Veridra/
 ├── backend/
 │   ├── app/
 │   │   ├── agents/          # Researcher, Writer, Editor, FactChecker, SingleAgent
-│   │   ├── api/v1/          # FastAPI REST & SSE endpoints + /publish
-│   │   ├── core/            # Settings, pricing rate card, SSRF security, logging redaction
-│   │   ├── db/              # SQLAlchemy models & session management
-│   │   ├── evaluation/      # Benchmark dataset & runner
+│   │   ├── api/v1/          # FastAPI REST, SSE & publishing routes
+│   │   ├── core/            # Settings, pricing rate card, SSRF security, log redaction
+│   │   ├── db/              # SQLAlchemy models & session setup
+│   │   ├── evaluation/      # 30-topic evaluation dataset & benchmark runner
 │   │   ├── graph/           # LangGraph workflow, nodes, state & routing
 │   │   ├── prompts/         # Versioned SHA-256-hashed prompt templates
 │   │   ├── providers/       # Gemini, OpenAI-compatible, Resilient failover, Tavily, Mock
 │   │   └── services/        # Persistence, export, social publishing
 │   ├── alembic/             # Database migrations
-│   └── tests/               # Backend unit & integration tests
+│   └── tests/               # Pytest unit & integration suite
 ├── frontend/
 │   └── src/
 │       ├── components/      # Aurora glass cards, ModelSelector, FormattedPostPreview
 │       ├── features/        # Dashboard, CreateRun, LiveRun, ContentStudio, Projects, Benchmarks, Settings
 │       └── lib/             # API client, SSE hook, social Unicode formatter
-├── scripts/verify.sh        # Full-stack lint, typecheck, test & build verification
-├── docker-compose.yml
-└── .gitignore               # Excludes .env, *.db, .venv, node_modules, dist, caches
+├── scripts/verify.sh        # Unified lint, typecheck, test & build script
+└── docker-compose.yml
 ```
 
 ---
 
 ## Testing & Verification
 
-Run the entire backend + frontend verification suite in one command:
+Run all backend and frontend checks in a single command:
 ```bash
 ./scripts/verify.sh
 ```
-This runs:
+This executes:
 - **Backend**: `ruff check app tests`, `mypy app`, `pytest -v`
 - **Frontend**: `vitest run`, `tsc -b --noEmit`, `eslint .`, `vite build`
-
----
-
-## What Is Excluded from GitHub (`.gitignore`)
-Your repository's [`.gitignore`](.gitignore) ensures sensitive and generated files are never pushed:
-- **Secrets**: `.env`, `.env.*`, `backend/.env` (while keeping `.env.example` and `backend/.env.example` tracked)
-- **Local Databases**: `*.db`, `*.db-shm`, `*.db-wal`, `*.sqlite*` (including `veridra.db` and `veridra_checkpoints.db`)
-- **Environments & Dependencies**: `.venv/`, `node_modules/`, `dist/`, `.vite/`
-- **Caches & Logs**: `__pycache__/`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `*.tsbuildinfo`, `*.log`, `.DS_Store`
