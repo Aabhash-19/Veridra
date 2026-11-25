@@ -1,0 +1,51 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: ./.env
+        required: false
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/veridra.db}
+      CHECKPOINT_DB_PATH: ${CHECKPOINT_DB_PATH:-/data/veridra_checkpoints.db}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080}
+      DEMO_MODE: ${DEMO_MODE:-false}
+    volumes:
+      - veridra_local_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Optional PostgreSQL service for production-like testing:
+  # Run with: docker compose --profile postgres up
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: veridra
+      POSTGRES_USER: veridra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-veridra_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - veridra_pg_data:/var/lib/postgresql/data
+
+volumes:
+  veridra_local_data:
+  veridra_pg_data:

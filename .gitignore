@@ -1,0 +1,48 @@
+# Secrets & Environment Files (NEVER commit real API keys)
+.env
+.env.*
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
+# Python / Backend
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local Databases & Checkpoints
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# Logs & Temp
+*.log
+npm-debug.log*
+.cache/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
