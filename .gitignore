@@ -38,6 +38,7 @@ coverage/
 *.log
 npm-debug.log*
 .cache/
+Demo.mov
 
 # OS & Editor
 .DS_Store
