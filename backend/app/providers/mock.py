@@ -477,8 +477,8 @@ class MockLLMProvider(LLMProvider):
                 score=breakdown.computed_total,  # 72 < 85 every time
                 score_breakdown=breakdown,
                 verdict="revise",
-                critical_issues=[],
-                major_issues=["Draft still falls below target editorial density."],
+                critical_issues=["Draft still falls below target editorial density."],
+                major_issues=[],
                 minor_issues=[],
                 rewrite_instructions=["Increase analytical depth and sharpen transitions."],
                 summary=f"Revision pass {call_num} remains below threshold.",

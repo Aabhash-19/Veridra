@@ -54,8 +54,13 @@ def decide_editor_route(
     if verdict == "blocked":
         return "safe_stop", "EDITORIAL_BLOCKED"
 
-    # Never allow score above threshold to override critical blockers
-    if score >= threshold and len(critical_issues) == 0 and verdict == "approve":
+    # Never allow score above threshold to override critical blockers.
+    # After at least one completed revision with zero critical blockers and an acceptable score (>= 60),
+    # advance to fact_checker rather than looping to a terminal retry failure.
+    if len(critical_issues) == 0 and (
+        (score >= threshold and verdict == "approve")
+        or (editor_revision_count >= 1 and score >= 60)
+    ):
         return "fact_checker", None
 
     if editor_revision_count < limits.max_editor_revisions:
