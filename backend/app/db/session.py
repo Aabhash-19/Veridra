@@ -11,9 +11,17 @@ class Base(DeclarativeBase):
     pass
 
 
+def _normalize_db_url(url: str) -> str:
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url[len("postgres://") :]
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://") :]
+    return url
+
+
 def build_engine(database_url: str | None = None) -> Engine:
     settings = get_settings()
-    url = database_url or settings.database_url
+    url = _normalize_db_url(database_url or settings.database_url)
     connect_args: dict = {}
     if url.startswith("sqlite"):
         connect_args = {"check_same_thread": False, "timeout": 30}
