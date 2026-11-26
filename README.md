@@ -6,9 +6,13 @@
 
 An open-source, multi-agent AI editorial studio that turns any topic into source-grounded, fact-checked, social-ready posts for **LinkedIn**, **X (Twitter)**, and **Instagram** — with live step-by-step streaming and 1-click publishing.
 
+[![Live App](https://img.shields.io/badge/Live%20Demo-veridra--web.onrender.com-10b981?style=flat-square&logo=render&logoColor=white)](https://veridra-web.onrender.com)
 [![FastAPI + LangGraph](https://img.shields.io/badge/Backend-FastAPI%20%7C%20LangGraph%20%7C%20Python%203.11%2B-4f46e5?style=flat-square)](#tech-stack)
 [![React + TypeScript](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Tailwind%20v4-ec4899?style=flat-square)](#tech-stack)
 [![Verification](https://img.shields.io/badge/Verified-pytest%20%7C%20vitest%20%7C%20mypy%20%7C%20ruff-14b8a6?style=flat-square)](#testing--verification)
+
+**[Open Live App → https://veridra-web.onrender.com](https://veridra-web.onrender.com)**
+<sub>*(Hosted on Render free tier — the first API request after inactivity may take ~30–45s to wake up.)*</sub>
 
 </div>
 
@@ -150,6 +154,23 @@ npm install
 npm run dev
 ```
 Open **`http://localhost:5173`** in your browser. Vite automatically proxies `/api` and `/health` requests to `http://127.0.0.1:8000`.
+
+---
+
+## Live Cloud Deployment (Render Blueprint)
+
+Veridra is deployed live at **[https://veridra-web.onrender.com](https://veridra-web.onrender.com)** using [`render.yaml`](render.yaml), which provisions:
+- **`veridra-db`** — Managed PostgreSQL database
+- **`veridra-api`** — FastAPI + LangGraph backend (`alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`)
+- **`veridra-web`** — React + Vite static frontend with `VITE_API_BASE_URL` auto-linked to `veridra-api`
+
+To deploy your own instance on Render:
+1. Fork or clone this repository to GitHub.
+2. In **[Render Dashboard](https://dashboard.render.com)**, click **New + → Blueprint** and select your repo.
+3. Paste your AI / Tavily API keys (or set `DEMO_MODE=true`) and click **Apply**.
+4. Ensure `CORS_ORIGINS` on `veridra-api` matches your `veridra-web` URL.
+
+*(An optional `frontend/vercel.json` is also included if you prefer deploying the frontend separately on Vercel.)*
 
 ---
 
